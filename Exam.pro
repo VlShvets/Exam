@@ -29,12 +29,18 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     xmlparser.cpp \
-    order.cpp
+    order.cpp \
+    orderwithloading.cpp \
+    orderwithoutloading.cpp \
+    customer.cpp
 
 HEADERS += \
         mainwindow.h \
     order.h \
-    xmlparser.h
+    xmlparser.h \
+    orderwithloading.h \
+    orderwithoutloading.h \
+    customer.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

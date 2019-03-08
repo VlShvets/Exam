@@ -1,58 +1,31 @@
 #ifndef ORDER_H
 #define ORDER_H
 
-#include <QString>
-
 struct Order
 {
 private:
-    int num;
-    QString surname;
-    float shippingCost;
     bool isLoading;
-    float loadingCost;
-    uint stayingTime;
+    float shippingCost;    
     float sumCost = 0.0;
 
-    static float stayingCost;
-
 public:
-    inline int getNum() const;
-    void setNum(int value);
-
-    inline QString getSurname() const;
-    void setSurname(const QString &value);
-
-    inline float getShippingCost() const;
-    void setShippingCost(float value);
-
+    void setIsLoading(bool _isLoading);
     inline bool getIsLoading() const;
-    void setIsLoading(bool value);
 
-    inline float getLoadingCost() const;
-    void setLoadingCost(float value);
+    void setShippingCost(float _shippingCost);
+    inline float getShippingCost() const;
 
-    inline uint getStayingTime() const;
-    void setStayingTime(const uint &value);
-
+    void setSumCost(float _sumCost);
     inline float getSumCost() const;
-    void setSumCost(float value);
 
-    inline static float getStayingCost();
-    static void setStayingCost(float value);
+    virtual void setLoadingCost(const float) {}
+    virtual inline float getLoadingCost() const;
+
+    virtual void setStayingTime(const int) {}
+    virtual inline int getStayingTime() const;
+
+    virtual void solveSumCost() = 0;
 };
-
-#endif // ORDER_H
-
-int Order::getNum() const
-{
-    return num;
-}
-
-QString Order::getSurname() const
-{
-    return surname;
-}
 
 float Order::getShippingCost() const
 {
@@ -64,23 +37,19 @@ bool Order::getIsLoading() const
     return isLoading;
 }
 
-float Order::getLoadingCost() const
-{
-    return loadingCost;
-}
-
-uint Order::getStayingTime() const
-{
-    return stayingTime;
-}
-
 float Order::getSumCost() const
 {
     return sumCost;
 }
 
-
-float Order::getStayingCost()
+float Order::getLoadingCost() const
 {
-    return stayingCost;
+    return 0.0;
 }
+
+int Order::getStayingTime() const
+{
+    return 0;
+}
+
+#endif // ORDER_H

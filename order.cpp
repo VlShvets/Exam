@@ -1,43 +1,16 @@
 #include "order.h"
 
-float Order::stayingCost = 0.0;
-
-void Order::setNum(int value)
+void Order::setShippingCost(float _shippingCost)
 {
-    num = value;
+    shippingCost = _shippingCost;
 }
 
-void Order::setSurname(const QString &value)
+void Order::setIsLoading(bool _isLoading)
 {
-    surname = value;
+    isLoading = _isLoading;
 }
 
-void Order::setShippingCost(float value)
+void Order::setSumCost(float _sumCost)
 {
-    shippingCost = value;
-}
-
-void Order::setIsLoading(bool value)
-{
-    isLoading = value;
-}
-
-void Order::setLoadingCost(float value)
-{
-    loadingCost = value;
-}
-
-void Order::setStayingTime(const uint &value)
-{
-    stayingTime = value;
-}
-
-void Order::setSumCost(float value)
-{
-    sumCost = value;
-}
-
-void Order::setStayingCost(float value)
-{
-    stayingCost = value;
+    sumCost = _sumCost;
 }

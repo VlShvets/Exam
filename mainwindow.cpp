@@ -18,7 +18,7 @@ MainWindow::MainWindow(QWidget *parent)
     hblSecondComp->addWidget(lStayingCost);
 
     leStayingCost = new QLineEdit;
-    connect(leStayingCost, SIGNAL(editingFinished()), this, SLOT(changeStayingCost()));
+    leStayingCost->setReadOnly(true);
 
     hblSecondComp->addWidget(leStayingCost);
     hblSecondComp->addStretch();
@@ -27,22 +27,14 @@ MainWindow::MainWindow(QWidget *parent)
     connect(pbSolve, SIGNAL(clicked()), this, SLOT(solve()));
 
     hblSecondComp->addWidget(pbSolve);
-    hblSecondComp->addStretch();
-
-    pbSave = new QPushButton(tr("Сохранить"));
-    connect(pbSave, SIGNAL(clicked()), this, SLOT(save()));
-
-    hblSecondComp->addWidget(pbSave);
-    hblSecondComp->addStretch();
 
     vblFirstComp->addLayout(hblSecondComp);
 
     twOrders = new QTableWidget(ORDERS_ROWS, ORDERS_COLUMNS);
     QStringList slOrders;
     slOrders << "Фамилия" << "Стоимость перевозки" << "Погрузка" <<
-           "Стоимость погрузки" << "Минуты простой" << "Стоимость заказа";
+           "Стоимость погрузки" << "Минуты простоя" << "Стоимость заказа";
     twOrders->setHorizontalHeaderLabels(slOrders);
-    connect(twOrders, SIGNAL(cellChanged(int, int)), this, SLOT(changeOrder(int, int)));
 
     vblFirstComp->addWidget(twOrders);
 
@@ -78,14 +70,14 @@ MainWindow::MainWindow(QWidget *parent)
 
     this->setLayout(vblFirstComp);
 
-    xmlParser = new XmlParser(&orders);
+    xmlParser = new XmlParser(customers);
 }
 
 MainWindow::~MainWindow()
 {
-    for(Order *order : orders)
-        delete order;
-    orders.clear();
+    for(Customer *customer : customers)
+        delete customer;
+    customers.clear();
 
     delete leStayingCost;
     delete leSurname;
@@ -99,7 +91,6 @@ MainWindow::~MainWindow()
 
     delete pbLoad;
     delete pbSolve;
-    delete pbSave;
     delete pbFind;
 
     delete hblThirdComp;
@@ -109,7 +100,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::load()
 {
-    QString str = QFileDialog::getOpenFileName(0,
+    QString str = QFileDialog::getOpenFileName(nullptr,
                                                tr("Загрузить данные"),
                                                "../Exam/input.xml",
                                                "*.xml");
@@ -128,33 +119,13 @@ void MainWindow::load()
 
 void MainWindow::solve()
 {
-    for(Order *order : orders)
+    for(Customer *customer : customers)
     {
-        if(order->getIsLoading())
-            order->setSumCost(order->getShippingCost() + order->getLoadingCost());
-        else
-            order->setSumCost(order->getShippingCost() + Order::getStayingCost() * order->getStayingTime());
+        for(Order *order : customer->orders)
+            order->solveSumCost();
     }
 
     setTable();
-}
-
-void MainWindow::save()
-{
-    QString str = QFileDialog::getSaveFileName(0,
-                                               tr("Сохранить данные"),
-                                               "../Exam/output.xml",
-                                               "*.xml");
-    if(!str.isEmpty())
-    {
-        QFile file(str);
-        if(file.open(QIODevice::WriteOnly))
-        {
-            QTextStream(&file) << xmlParser->createXml();
-
-            file.close();
-        }
-    }
 }
 
 void MainWindow::find()
@@ -163,70 +134,60 @@ void MainWindow::find()
 
     float sumCost = 0.0;
 
-    for(Order *order : orders)
+    for(Customer *customer : customers)
     {
-        if(order->getSurname() == leSurname->text())
-            sumCost += order->getSumCost();
+        if(customer->getSurname() == leSurname->text())
+        {
+            for(Order *order : customer->orders)
+                sumCost += order->getSumCost();
+            break;
+        }
     }
 
     leSumCost->setText(QString::number(sumCost));
 }
 
-void MainWindow::changeStayingCost()
-{
-    Order::setStayingCost(leStayingCost->text().toFloat());
-}
-
-void MainWindow::changeOrder(int i, int j)
-{
-    switch(j)
-    {
-    case 0:
-        orders.at(i)->setSurname(twOrders->item(i, j)->text());
-        break;
-    case 1:
-        orders.at(i)->setShippingCost(twOrders->item(i, j)->text().toFloat());
-        break;
-    case 2:
-        orders.at(i)->setIsLoading(twOrders->item(i, j)->text() == "1" ? true : false);
-        break;
-    case 3:
-        orders.at(i)->setLoadingCost(twOrders->item(i, j)->text().toFloat());
-        break;
-    case 4:
-        orders.at(i)->setStayingTime(twOrders->item(i, j)->text().toInt());
-        break;
-    default:
-        break;
-    }
-}
-
 void MainWindow::setTable()
 {
-    leStayingCost->setText(QString::number(Order::getStayingCost()));
+    leStayingCost->setText(QString::number(OrderWithoutLoading::getStayingCost()));
 
-    twOrders->setRowCount(orders.count());
+    int rowCount = 0;
+    for(Customer *customer : customers)
+        rowCount += customer->orders.count();
+    twOrders->setRowCount(rowCount);
 
     QTableWidgetItem *twiOrder = nullptr;
 
-    for(Order *order : orders)
+    int numRow = 0;
+    for(Customer *customer : customers)
     {
-        twiOrder = new QTableWidgetItem(order->getSurname());
-        twOrders->setItem(order->getNum() - 1, 0, twiOrder);
+        for(Order *order: customer->orders)
+        {
+            twiOrder = new QTableWidgetItem(customer->getSurname());
+            twiOrder->setFlags(twiOrder->flags() ^ Qt::ItemIsEditable);
+            twOrders->setItem(numRow, 0, twiOrder);
 
-        twiOrder = new QTableWidgetItem(QString::number(order->getShippingCost()));
-        twOrders->setItem(order->getNum() - 1, 1, twiOrder);
+            twiOrder = new QTableWidgetItem(QString::number(order->getShippingCost()));
+            twiOrder->setFlags(twiOrder->flags() ^ Qt::ItemIsEditable);
+            twOrders->setItem(numRow, 1, twiOrder);
 
-        twiOrder = new QTableWidgetItem(QString::number(order->getIsLoading()));
-        twOrders->setItem(order->getNum() - 1, 2, twiOrder);
+            twiOrder = new QTableWidgetItem(QString::number(order->getIsLoading()));
+            twiOrder->setFlags(twiOrder->flags() ^ Qt::ItemIsEditable);
+            twOrders->setItem(numRow, 2, twiOrder);
 
-        twiOrder = new QTableWidgetItem(QString::number(order->getLoadingCost()));
-        twOrders->setItem(order->getNum() - 1, 3, twiOrder);
+            twiOrder = new QTableWidgetItem(QString::number(order->getLoadingCost()));
+            twiOrder->setFlags(twiOrder->flags() ^ Qt::ItemIsEditable);
+            twOrders->setItem(numRow, 3, twiOrder);
 
-        twiOrder = new QTableWidgetItem(QString::number(order->getStayingTime()));
-        twOrders->setItem(order->getNum() - 1, 4, twiOrder);
+            twiOrder = new QTableWidgetItem(QString::number(order->getStayingTime()));
+            twiOrder->setFlags(twiOrder->flags() ^ Qt::ItemIsEditable);
+            twOrders->setItem(numRow, 4, twiOrder);
 
-        twiOrder = new QTableWidgetItem(QString::number(order->getSumCost()));
-        twOrders->setItem(order->getNum() - 1, 5, twiOrder);
+            twiOrder = new QTableWidgetItem(QString::number(order->getSumCost()));
+            twiOrder->setFlags(twiOrder->flags() ^ Qt::ItemIsEditable);
+            twOrders->setItem(numRow, 5, twiOrder);
+
+            ++numRow;
+        }
     }
 }

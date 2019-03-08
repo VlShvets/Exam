@@ -25,16 +25,12 @@ public:
 private slots:
     void load();    /// Загрузка данных
     void solve();   /// Расчёт стоимости заказа
-    void save();    /// Сохранить данные
     void find();    /// Найти заказы по фамилии
-
-    void changeStayingCost();       /// Изменение цены простоя
-    void changeOrder(int i, int j); /// Изменение заказа
 
 private:
     void setTable();    /// Установить значения в таблицу
 
-    QList <Order *> orders;
+    QList <Customer *> customers;
     XmlParser *xmlParser;
 
     QVBoxLayout *vblFirstComp;
@@ -43,7 +39,6 @@ private:
 
     QPushButton *pbLoad;
     QPushButton *pbSolve;
-    QPushButton *pbSave;
     QPushButton *pbFind;
 
     QTableWidget *twOrders;

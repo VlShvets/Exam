@@ -1,37 +1,28 @@
 #ifndef XMLPARSER_H
 #define XMLPARSER_H
 
-#include "order.h"
+#include "customer.h"
+#include "orderwithloading.h"
+#include "orderwithoutloading.h"
 
-#include <QList>
+#include <QFile>
+#include <QMultiMap>
 #include <QDomDocument>
 
 class XmlParser
 {
 public:
-    XmlParser(QList <Order *> *orders);
+    XmlParser(QList <Customer *> &_customers);
     ~XmlParser();
 
-    QString createXml();
     void readXml(QFile &file);
 
 private:
-    QList <Order *> *orders;
+    void traverseNode(const QDomNode& node);
 
     QDomDocument *doc;
 
-    QDomElement makeOrder(const QString &surname,
-                          const QString &shippingCost,
-                          const QString &isLoading,
-                          const QString &loadingCost,
-                          const QString &stayingTime,
-                          const int num);
-
-    QDomElement makeElement(const QString &strName,
-                            const QString &strAttr = QString(),
-                            const QString &strText = QString());
-
-    void traverseNode(const QDomNode& node);
+    QList <Customer *> *customers;    
 };
 
 #endif // XMLPARSER_H

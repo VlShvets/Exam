@@ -2,46 +2,34 @@
 <!-- Orders -->
 <orders>
 	<stayingCost cost = "10"/>
-	<order number = "1">
-		<surname>Ivanov</surname>
-		<shippingCost>1500</shippingCost>
-		<isLoading>1</isLoading>
-		<loadingCost>500</loadingCost>
-		<stayingTime>0</stayingTime>
-	</order>
-	<order number = "2">
-		<surname>Petrov</surname>
-		<shippingCost>500</shippingCost>
-		<isLoading>0</isLoading>
-		<loadingCost>0</loadingCost>
-		<stayingTime>10</stayingTime>
-	</order>
-	<order number = "3">
-		<surname>Sidorov</surname>
-		<shippingCost>1000</shippingCost>
-		<isLoading>1</isLoading>
-		<loadingCost>250</loadingCost>
-		<stayingTime>0</stayingTime>
-	</order>
-	<order number = "4">
-		<surname>Ivanov</surname>
-		<shippingCost>2000</shippingCost>
-		<isLoading>0</isLoading>
-		<loadingCost>0</loadingCost>
-		<stayingTime>30</stayingTime>
-	</order>
-	<order number = "5">
-		<surname>Petrov</surname>
-		<shippingCost>3000</shippingCost>
-		<isLoading>1</isLoading>
-		<loadingCost>1000</loadingCost>
-		<stayingTime>0</stayingTime>
-	</order>
-	<order number = "6">
-		<surname>Sidorov</surname>
-		<shippingCost>500</shippingCost>
-		<isLoading>0</isLoading>
-		<loadingCost>0</loadingCost>
-		<stayingTime>60</stayingTime>
-	</order>
+	<customer surname = "Ivanov">
+		<order isLoading = "1">
+			<shippingCost>1500</shippingCost>
+			<loadingCost>500</loadingCost>
+		</order>
+		<order isLoading = "0">
+			<shippingCost>2000</shippingCost>
+			<stayingTime>30</stayingTime>
+		</order>
+	</customer>
+	<customer surname = "Petrov">
+		<order isLoading = "0">
+			<shippingCost>500</shippingCost>
+			<stayingTime>10</stayingTime>
+		</order>
+		<order isLoading = "1">
+			<shippingCost>3000</shippingCost>
+			<loadingCost>1000</loadingCost>
+		</order>
+	</customer>
+	<customer surname = "Sidorov">
+		<order isLoading = "1">
+			<shippingCost>1000</shippingCost>
+			<loadingCost>250</loadingCost>
+		</order>
+		<order isLoading = "0">
+			<shippingCost>500</shippingCost>
+			<stayingTime>60</stayingTime>
+		</order>
+	</customer>
 </orders>
